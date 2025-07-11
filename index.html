@@ -519,9 +519,8 @@
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 if (error.code === 'auth/operation-not-allowed') {
-                    showModal("Login Blocked. Please ensure 'Email/Password' sign-in is enabled in your Firebase project's
-    Authentication settings.");
-    } else {
+                    showModal("Login Blocked. Please ensure 'Email/Password' sign-in is enabled in your Firebase project's Authentication settings.");
+                } else {
                     showModal(`Login failed: ${error.message}`);
                 }
                 console.error("Login error:", error);
