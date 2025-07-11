@@ -500,9 +500,8 @@
                 await createUserWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 if (error.code === 'auth/operation-not-allowed') {
-                    showModal("Sign-Up Blocked. Please enable Email/Password sign-in in your Firebase project's Authentication
-    settings.");
-    } else {
+                    showModal("Sign-Up Blocked. Please enable Email/Password sign-in in your Firebase project's Authenticationsettings.");
+                } else {
                     showModal(`Sign up failed: ${error.message}`);
                 }
                 console.error("Sign up error:", error);
