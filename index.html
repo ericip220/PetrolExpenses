@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petrol Fill-up Tracker</title>
+    <!-- 
+        Tailwind CSS CDN is used for development convenience.
+        For production, it's recommended to install Tailwind CSS as a PostCSS plugin
+        or use the Tailwind CLI for better performance and optimization.
+        See: https://tailwindcss.com/docs/installation
+    -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -432,15 +438,17 @@
         const filterBtns = document.querySelectorAll('.filter-btn');
         const chartToggleBtns = document.querySelectorAll('.chart-toggle-btn');
 
+
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        // Replace with your actual Firebase project configuration from Firebase Console -> Project settings
         const firebaseConfig = {
-            apiKey: "AIzaSyBbGDJkfAvxxgZKb_m24cevQuuGdpgM240",
-            authDomain: "petrol-fill-up-tracker.firebaseapp.com",
-            projectId: "petrol-fill-up-tracker",
-            storageBucket: "petrol-fill-up-tracker.firebasestorage.app",
-            messagingSenderId: "293478669422",
-            appId: "1:293478669422:web:e9b4b99621f043f5e51a7f",
-            measurementId: "G-JM0EKCBRSS"
+            apiKey: "AIzaSyBbGDJkfAvxxgZKb_m24cevQuuGdpgM240", // <<< REPLACE THIS with your actual API Key
+            authDomain: "petrol-fill-up-tracker.firebaseapp.com", // <<< REPLACE THIS with your actual Auth Domain
+            projectId: "petrol-fill-up-tracker", // <<< REPLACE THIS with your actual Project ID
+            storageBucket: "petrol-fill-up-tracker.firebasestorage.app", // <<< REPLACE THIS with your actual Storage Bucket
+            messagingSenderId: "293478669422", // <<< REPLACE THIS with your actual Messaging Sender ID
+            appId: "1:293478669422:web:e9b4b99621f043f5e51a7f", // <<< REPLACE THIS with your actual App ID
+            measurementId: "G-JM0EKCBRSS" // <<< REPLACE THIS with your actual Measurement ID (optional)
         };
 
         // --- Utility Functions ---
@@ -500,7 +508,7 @@
                 await createUserWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 if (error.code === 'auth/operation-not-allowed') {
-                    showModal("Sign-Up Blocked. Please enable Email/Password sign-in in your Firebase project's Authenticationsettings.");
+                    showModal("Sign-Up Blocked. Please enable Email/Password sign-in in your Firebase project's Authentication settings.");
                 } else {
                     showModal(`Sign up failed: ${error.message}`);
                 }
@@ -566,37 +574,28 @@
 
         async function extractDataFromImage(base64ImageData) {
             const prompt = `
-    Analyze this petrol receipt image. Extract the following details:
-    - petrolStationName (string, e.g., "Shell", "BP")
-    - petrolStationLocation (string, e.g., "Surbiton", "London")
-    - fuelType (string, standardize to common names. For example, "Shell V-Power ULD", "Shell V-Power Unleaded",
-    "V-Power Unleaded" should all become "V-Power Unleaded". "Esso Synergy Supreme+", "Esso Synergy Supreme Diesel"
-    should become "Synergy Supreme". "Unleaded 95", "Unleaded" should become "Unleaded 95". "Diesel", "Regular Diesel"
-    should become "Diesel". If a specific brand/variant is present, prioritize that, otherwise use general terms like
-    "Petrol", "Diesel", "Electric", "Other". Ensure the output is concise and standardized.)
-    - litresFilled (number, e.g., 45.50)
-    - pricePerLitre (number, e.g., 1.599)
-    - totalCost (number, e.g., 72.75)
-    - odometerReading (number, e.g., 123456) - If not explicitly on receipt, infer from common patterns or leave null.
-    - date (string, YYYY-MM-DD)
-    - time (string, HH:MM)
+                Analyze this petrol receipt image. Extract the following details:
+                - petrolStationName (string, e.g., "Shell", "BP")
+                - petrolStationLocation (string, e.g., "Surbiton", "London")
+                - fuelType (string, standardize to common names. For example, "Shell V-Power ULD", "Shell V-Power Unleaded", "V-Power Unleaded" should all become "V-Power Unleaded". "Esso Synergy Supreme+", "Esso Synergy Supreme Diesel" should become "Synergy Supreme Diesel". "Unleaded 95", "Unleaded" should become "Unleaded 95". "Diesel", "Regular Diesel" should become "Diesel". If a specific brand/variant is present, prioritize that, otherwise use general terms like "Petrol", "Diesel", "Electric", "Other". Ensure the output is concise and standardized.)
+                - litresFilled (number, e.g., 45.50)
+                - pricePerLitre (number, e.g., 1.599)
+                - totalCost (number, e.g., 72.75)
+                - odometerReading (number, e.g., 123456) - If not explicitly on receipt, infer from common patterns or leave null.
+                - date (string, YYYY-MM-DD)
+                - time (string, HH:MM)
 
-    Return a single JSON object with these keys. If a value cannot be found, use null or an empty string for strings,
-    and 0 for numbers, but try your best to extract.
-    `;
+                Return a single JSON object with these keys. If a value cannot be found, use null or an empty string for strings, and 0 for numbers, but try your best to extract.
+            `;
             const payload = {
                 contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64ImageData } }] }],
                 generationConfig: { "responseMimeType": "application/json" }
             };
             const apiKey = ""; // API key will be provided by Canvas runtime
-            const apiUrl =
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body:
-                        JSON.stringify(payload)
-                });
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) throw new Error(`API call failed: ${response.status}`);
                 const result = await response.json();
 
@@ -645,11 +644,9 @@
             };
 
             // Validate inputs
-            if (!fillupData.petrolStationName || isNaN(fillupData.litresFilled) || isNaN(fillupData.pricePerLitre) ||
-                isNaN(fillupData.totalCost) || !fillupData.date || isNaN(fillupData.odometerReading)) {
-                showModal("Please fill in Petrol Station Name, Litres, Price, Total Cost, Odometer Reading, and Date with valid
-    values.");
-    return;
+            if (!fillupData.petrolStationName || isNaN(fillupData.litresFilled) || isNaN(fillupData.pricePerLitre) || isNaN(fillupData.totalCost) || !fillupData.date || isNaN(fillupData.odometerReading)) {
+                showModal("Please fill in Petrol Station Name, Litres, Price, Total Cost, Odometer Reading, and Date with valid values.");
+                return;
             }
 
             try {
@@ -693,14 +690,14 @@
             const locationText = fillup.petrolStationLocation ? ` (${fillup.petrolStationLocation})` : '';
             detailModalTitle.textContent = `Details for ${fillup.petrolStationName}${locationText}`;
             detailModalContent.innerHTML = `
-    <p><strong>Date:</strong> ${new Date(fillup.date).toLocaleDateString()}</p>
-    <p><strong>Time:</strong> ${fillup.time || 'N/A'}</p>
-    <p><strong>Fuel Type:</strong> ${fillup.fuelType || 'N/A'}</p>
-    <p><strong>Litres Filled:</strong> ${fillup.litresFilled.toFixed(2)} L</p>
-    <p><strong>Price Per Litre:</strong> £${fillup.pricePerLitre.toFixed(3)}</p>
-    <p><strong>Total Cost:</strong> £${fillup.totalCost.toFixed(2)}</p>
-    <p><strong>Odometer Reading:</strong> ${fillup.odometerReading.toLocaleString()}</p>
-    `;
+                <p><strong>Date:</strong> ${new Date(fillup.date).toLocaleDateString()}</p>
+                <p><strong>Time:</strong> ${fillup.time || 'N/A'}</p>
+                <p><strong>Fuel Type:</strong> ${fillup.fuelType || 'N/A'}</p>
+                <p><strong>Litres Filled:</strong> ${fillup.litresFilled.toFixed(2)} L</p>
+                <p><strong>Price Per Litre:</strong> £${fillup.pricePerLitre.toFixed(3)}</p>
+                <p><strong>Total Cost:</strong> £${fillup.totalCost.toFixed(2)}</p>
+                <p><strong>Odometer Reading:</strong> ${fillup.odometerReading.toLocaleString()}</p>
+            `;
             showModal(null, 'detail');
         }
 
@@ -765,11 +762,10 @@
                 const mainContent = document.createElement('div');
                 mainContent.className = 'flex-grow cursor-pointer';
                 mainContent.innerHTML = `
-    <p class="font-semibold text-gray-800">${fillup.petrolStationName}${locationText}</p>
-    <p class="text-sm text-gray-500">${new Date(fillup.date).toLocaleDateString()} at ${fillup.time || ''} -
-        ${fillup.fuelType || 'N/A'}</p>
-    <p class="text-xs text-gray-400">Odometer: ${fillup.odometerReading.toLocaleString()}</p>
-    `;
+                    <p class="font-semibold text-gray-800">${fillup.petrolStationName}${locationText}</p>
+                    <p class="text-sm text-gray-500">${new Date(fillup.date).toLocaleDateString()} at ${fillup.time || ''} - ${fillup.fuelType || 'N/A'}</p>
+                    <p class="text-xs text-gray-400">Odometer: ${fillup.odometerReading.toLocaleString()}</p>
+                `;
                 mainContent.addEventListener('click', () => displayFillupDetails(fillup));
 
                 const totalEl = document.createElement('p');
@@ -778,9 +774,7 @@
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'ml-4 p-2 rounded-full hover:bg-red-100 text-gray-400 hover:text-red-600 transition-colors';
-                deleteBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-    </svg>`;
+                deleteBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
                 deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); promptForDelete(fillup.id); });
 
                 fillupEl.appendChild(mainContent);
@@ -853,9 +847,7 @@
 
             const totalSpent = filteredFillups.reduce((sum, fillup) => sum + fillup.totalCost, 0);
             const totalLitres = filteredFillups.reduce((sum, fillup) => sum + fillup.litresFilled, 0);
-            summaryTotalEl.textContent = new Intl.NumberFormat('en-GB', {
-                style: 'currency', currency: 'GBP'
-            }).format(totalSpent);
+            summaryTotalEl.textContent = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(totalSpent);
             summaryLitresEl.textContent = `${totalLitres.toFixed(2)} L`;
 
             let dataByGroup;
@@ -881,11 +873,9 @@
                 const listItem = document.createElement('div');
                 listItem.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-md';
                 listItem.innerHTML = `
-    <span class="font-medium text-gray-800">${groupName}</span>
-    <span class="font-semibold text-gray-900">${new Intl.NumberFormat('en-GB', {
-                    style: 'currency', currency: 'GBP'
-                }).format(amount)}</span>
-    `;
+                    <span class="font-medium text-gray-800">${groupName}</span>
+                    <span class="font-semibold text-gray-900">${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount)}</span>
+                `;
                 summaryListEl.appendChild(listItem);
             }
 
@@ -909,14 +899,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' }, tooltip: {
-                            callbacks: {
-                                label: (c) => `${c.label}: ${new
-                                    Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(c.parsed)}`
-                            }
-                        }
-                    }
+                    plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => `${c.label}: ${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(c.parsed)}` } } }
                 }
             });
         }
@@ -952,8 +935,7 @@
             });
 
             exportBtn.addEventListener('click', () => {
-                let csvContent = "data:text/csv;charset=utf-8,Date,Time,Petrol Station,Location,Fuel Type,Litres Filled,Price Per
-                Litre, Total Cost, Odometer Reading\n";
+                let csvContent = "data:text/csv;charset=utf-8,Date,Time,Petrol Station,Location,Fuel Type,Litres Filled,Price Per Litre,Total Cost,Odometer Reading\n";
                 allFillups.forEach(fillup => {
                     const row = [
                         fillup.date,
@@ -1027,13 +1009,12 @@
                     updateNav('nav-home');
                 } else {
                     try {
-                        if (typeof __initial_auth_token !== 'undefined') {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
+                        // For deployed apps outside of Canvas, __initial_auth_token will be undefined.
+                        // We rely on anonymous sign-in for simplicity as per previous requests.
+                        await signInAnonymously(auth);
                     } catch (error) {
                         console.error("Firebase anonymous sign-in failed:", error);
+                        // Fallback to showing auth screen if anonymous sign-in fails
                         userId = null;
                         isAuthReady = false;
                         if (unsubscribeHistory) unsubscribeHistory();
