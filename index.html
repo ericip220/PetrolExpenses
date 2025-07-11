@@ -591,7 +591,9 @@
                 contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64ImageData } }] }],
                 generationConfig: { "responseMimeType": "application/json" }
             };
-            const apiKey = ""; // API key will be provided by Canvas runtime
+            // IMPORTANT: Replace "YOUR_GOOGLE_CLOUD_API_KEY_HERE" with your actual Google Cloud API Key
+            // This key needs to have access to the Generative Language API (Gemini API)
+            const apiKey = "AIzaSyCaFlfWSJwlIzjKik1UV71JgiXj4wUDLZc";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             try {
