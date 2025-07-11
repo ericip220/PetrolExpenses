@@ -432,608 +432,618 @@
         const filterBtns = document.querySelectorAll('.filter-btn');
         const chartToggleBtns = document.querySelectorAll('.chart-toggle-btn');
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBbGDJkfAvxxgZKb_m24cevQuuGdpgM240",
-    authDomain: "petrol-fill-up-tracker.firebaseapp.com",
-    projectId: "petrol-fill-up-tracker",
-    storageBucket: "petrol-fill-up-tracker.firebasestorage.app",
-    messagingSenderId: "293478669422",
-    appId: "1:293478669422:web:e9b4b99621f043f5e51a7f",
-    measurementId: "G-JM0EKCBRSS"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-        // --- Utility Functions ---
-        function showMainAppScreen(screenId) {
-            mainAppScreens.forEach(screen => {
-                screen.classList.toggle('active-screen', screen.id === screenId);
-            });
-            if (screenId === 'history-screen' && isAuthReady) {
-                fetchAndDisplayHistory();
-            } else if (screenId === 'summary-screen' && isAuthReady) {
-                loadSummaryData();
-            } else if (unsubscribeHistory) {
-                unsubscribeHistory();
-                unsubscribeHistory = null;
-            }
-        }
-
-        function updateNav(activeBtnId) {
-            navBtns.forEach(btn => {
-                btn.classList.toggle('bg-white', btn.id === activeBtnId);
-                btn.classList.toggle('text-blue-600', btn.id === activeBtnId);
-                btn.classList.toggle('shadow', btn.id === activeBtnId);
-                btn.classList.toggle('text-gray-600', btn.id !== activeBtnId);
-            });
-        }
-
-        function showModal(message, type = 'alert') {
-            if (type === 'alert') {
-                alertModalMessage.textContent = message;
-                alertModal.style.display = 'flex';
-            } else if (type === 'detail') {
-                detailModal.style.display = 'flex';
-            } else if (type === 'deleteConfirm') {
-                deleteConfirmModal.style.display = 'flex';
-            }
-        }
-
-        function hideModal(type = 'alert') {
-            if (type === 'alert') {
-                alertModal.style.display = 'none';
-            } else if (type === 'detail') {
-                detailModal.style.display = 'none';
-            } else if (type === 'deleteConfirm') {
-                deleteConfirmModal.style.display = 'none';
-            }
-        }
-
-        // --- Authentication Logic ---
-        const handleSignUp = async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            if (!email || !password) {
-                showModal("Please enter an email and password.");
-                return;
-            }
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                if (error.code === 'auth/operation-not-allowed') {
-                    showModal("Sign-Up Blocked. Please enable Email/Password sign-in in your Firebase project's Authentication settings.");
-                } else {
-                    showModal(`Sign up failed: ${error.message}`);
-                }
-                console.error("Sign up error:", error);
-            }
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbGDJkfAvxxgZKb_m24cevQuuGdpgM240",
+            authDomain: "petrol-fill-up-tracker.firebaseapp.com",
+            projectId: "petrol-fill-up-tracker",
+            storageBucket: "petrol-fill-up-tracker.firebasestorage.app",
+            messagingSenderId: "293478669422",
+            appId: "1:293478669422:web:e9b4b99621f043f5e51a7f",
+            measurementId: "G-JM0EKCBRSS"
         };
 
-        const handleLogin = async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            if (!email || !password) {
-                showModal("Please enter an email and password.");
-                return;
-            }
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                if (error.code === 'auth/operation-not-allowed') {
-                    showModal("Login Blocked. Please ensure 'Email/Password' sign-in is enabled in your Firebase project's Authentication settings.");
-                } else {
-                    showModal(`Login failed: ${error.message}`);
-                }
-                console.error("Login error:", error);
-            }
-        };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
 
-        const handleLogout = async () => {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                showModal(`Logout failed: ${error.message}`);
-                console.error("Logout error:", error);
-            }
-        };
+    // --- Utility Functions ---
+    function showMainAppScreen(screenId) {
+    mainAppScreens.forEach(screen => {
+    screen.classList.toggle('active-screen', screen.id === screenId);
+    });
+    if (screenId === 'history-screen' && isAuthReady) {
+    fetchAndDisplayHistory();
+    } else if (screenId === 'summary-screen' && isAuthReady) {
+    loadSummaryData();
+    } else if (unsubscribeHistory) {
+    unsubscribeHistory();
+    unsubscribeHistory = null;
+    }
+    }
 
-        // --- AI Receipt Reading Logic ---
-        function toBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = error => reject(error);
-            });
-        }
+    function updateNav(activeBtnId) {
+    navBtns.forEach(btn => {
+    btn.classList.toggle('bg-white', btn.id === activeBtnId);
+    btn.classList.toggle('text-blue-600', btn.id === activeBtnId);
+    btn.classList.toggle('shadow', btn.id === activeBtnId);
+    btn.classList.toggle('text-gray-600', btn.id !== activeBtnId);
+    });
+    }
 
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+    function showModal(message, type = 'alert') {
+    if (type === 'alert') {
+    alertModalMessage.textContent = message;
+    alertModal.style.display = 'flex';
+    } else if (type === 'detail') {
+    detailModal.style.display = 'flex';
+    } else if (type === 'deleteConfirm') {
+    deleteConfirmModal.style.display = 'flex';
+    }
+    }
 
-            fileNameDisplay.textContent = `Selected: ${file.name}`;
-            showMainAppScreen('processing-screen');
+    function hideModal(type = 'alert') {
+    if (type === 'alert') {
+    alertModal.style.display = 'none';
+    } else if (type === 'detail') {
+    detailModal.style.display = 'none';
+    } else if (type === 'deleteConfirm') {
+    deleteConfirmModal.style.display = 'none';
+    }
+    }
 
-            try {
-                const base64Image = await toBase64(file);
-                await extractDataFromImage(base64Image);
-            } catch (error) {
-                console.error("Error processing file:", error);
-                showModal("Could not process the image. Please try again.");
-                showMainAppScreen('home-screen');
-            }
-            receiptUploadInput.value = ''; // Clear the file input
-        }
+    // --- Authentication Logic ---
+    const handleSignUp = async () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    if (!email || !password) {
+    showModal("Please enter an email and password.");
+    return;
+    }
+    try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+    if (error.code === 'auth/operation-not-allowed') {
+    showModal("Sign-Up Blocked. Please enable Email/Password sign-in in your Firebase project's Authentication
+    settings.");
+    } else {
+    showModal(`Sign up failed: ${error.message}`);
+    }
+    console.error("Sign up error:", error);
+    }
+    };
 
-        async function extractDataFromImage(base64ImageData) {
-            const prompt = `
-                Analyze this petrol receipt image. Extract the following details:
-                - petrolStationName (string, e.g., "Shell", "BP")
-                - petrolStationLocation (string, e.g., "Surbiton", "London")
-                - fuelType (string, standardize to common names. For example, "Shell V-Power ULD", "Shell V-Power Unleaded", "V-Power Unleaded" should all become "V-Power Unleaded". "Esso Synergy Supreme+", "Esso Synergy Supreme Diesel" should become "Synergy Supreme". "Unleaded 95", "Unleaded" should become "Unleaded 95". "Diesel", "Regular Diesel" should become "Diesel". If a specific brand/variant is present, prioritize that, otherwise use general terms like "Petrol", "Diesel", "Electric", "Other". Ensure the output is concise and standardized.)
-                - litresFilled (number, e.g., 45.50)
-                - pricePerLitre (number, e.g., 1.599)
-                - totalCost (number, e.g., 72.75)
-                - odometerReading (number, e.g., 123456) - If not explicitly on receipt, infer from common patterns or leave null.
-                - date (string, YYYY-MM-DD)
-                - time (string, HH:MM)
+    const handleLogin = async () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    if (!email || !password) {
+    showModal("Please enter an email and password.");
+    return;
+    }
+    try {
+    await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+    if (error.code === 'auth/operation-not-allowed') {
+    showModal("Login Blocked. Please ensure 'Email/Password' sign-in is enabled in your Firebase project's
+    Authentication settings.");
+    } else {
+    showModal(`Login failed: ${error.message}`);
+    }
+    console.error("Login error:", error);
+    }
+    };
 
-                Return a single JSON object with these keys. If a value cannot be found, use null or an empty string for strings, and 0 for numbers, but try your best to extract.
-            `;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64ImageData } }] }],
-                generationConfig: { "responseMimeType": "application/json" }
-            };
-            const apiKey = ""; // API key will be provided by Canvas runtime
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const handleLogout = async () => {
+    try {
+    await signOut(auth);
+    } catch (error) {
+    showModal(`Logout failed: ${error.message}`);
+    console.error("Logout error:", error);
+    }
+    };
 
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`API call failed: ${response.status}`);
-                const result = await response.json();
+    // --- AI Receipt Reading Logic ---
+    function toBase64(file) {
+    return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+    });
+    }
 
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                    const data = JSON.parse(result.candidates[0].content.parts[0].text);
-                    currentExtractedDetails = data; // Store extracted data
-                    populateConfirmationScreen(data);
-                    showMainAppScreen('confirmation-screen');
-                } else {
-                    throw new Error("Invalid response structure from Gemini API.");
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API:", error);
-                showModal("Failed to read the receipt. Please try another image or enter details manually.");
-                resetForm(); // Reset home screen form
-                showMainAppScreen('home-screen'); // Go back to home screen for manual input
-            }
-        }
+    async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-        function populateConfirmationScreen(data) {
-            confirmPetrolStationNameInput.value = data.petrolStationName || '';
-            confirmPetrolStationLocationInput.value = data.petrolStationLocation || '';
-            confirmFuelTypeInput.value = data.fuelType || '';
-            confirmLitresFilledInput.value = data.litresFilled || '';
-            confirmPricePerLitreInput.value = data.pricePerLitre || '';
-            confirmTotalCostInput.value = data.totalCost || '';
-            confirmOdometerReadingInput.value = data.odometerReading || '';
-            confirmDateInput.value = data.date || new Date().toISOString().split('T')[0];
-            confirmTimeInput.value = data.time || '';
-        }
+    fileNameDisplay.textContent = `Selected: ${file.name}`;
+    showMainAppScreen('processing-screen');
 
-        async function saveFillup() {
-            if (!isAuthReady) { showModal("Authentication not ready. Please wait."); return; }
+    try {
+    const base64Image = await toBase64(file);
+    await extractDataFromImage(base64Image);
+    } catch (error) {
+    console.error("Error processing file:", error);
+    showModal("Could not process the image. Please try again.");
+    showMainAppScreen('home-screen');
+    }
+    receiptUploadInput.value = ''; // Clear the file input
+    }
 
-            const fillupData = {
-                petrolStationName: confirmPetrolStationNameInput.value.trim() || 'Unknown Station',
-                petrolStationLocation: confirmPetrolStationLocationInput.value.trim(),
-                fuelType: confirmFuelTypeInput.value.trim() || 'Other',
-                litresFilled: parseFloat(confirmLitresFilledInput.value) || 0,
-                pricePerLitre: parseFloat(confirmPricePerLitreInput.value) || 0,
-                totalCost: parseFloat(confirmTotalCostInput.value) || 0,
-                odometerReading: parseInt(confirmOdometerReadingInput.value) || 0,
-                date: confirmDateInput.value,
-                time: confirmTimeInput.value,
-                createdAt: new Date().toISOString()
-            };
+    async function extractDataFromImage(base64ImageData) {
+    const prompt = `
+    Analyze this petrol receipt image. Extract the following details:
+    - petrolStationName (string, e.g., "Shell", "BP")
+    - petrolStationLocation (string, e.g., "Surbiton", "London")
+    - fuelType (string, standardize to common names. For example, "Shell V-Power ULD", "Shell V-Power Unleaded",
+    "V-Power Unleaded" should all become "V-Power Unleaded". "Esso Synergy Supreme+", "Esso Synergy Supreme Diesel"
+    should become "Synergy Supreme". "Unleaded 95", "Unleaded" should become "Unleaded 95". "Diesel", "Regular Diesel"
+    should become "Diesel". If a specific brand/variant is present, prioritize that, otherwise use general terms like
+    "Petrol", "Diesel", "Electric", "Other". Ensure the output is concise and standardized.)
+    - litresFilled (number, e.g., 45.50)
+    - pricePerLitre (number, e.g., 1.599)
+    - totalCost (number, e.g., 72.75)
+    - odometerReading (number, e.g., 123456) - If not explicitly on receipt, infer from common patterns or leave null.
+    - date (string, YYYY-MM-DD)
+    - time (string, HH:MM)
 
-            // Validate inputs
-            if (!fillupData.petrolStationName || isNaN(fillupData.litresFilled) || isNaN(fillupData.pricePerLitre) || isNaN(fillupData.totalCost) || !fillupData.date || isNaN(fillupData.odometerReading)) {
-                showModal("Please fill in Petrol Station Name, Litres, Price, Total Cost, Odometer Reading, and Date with valid values.");
-                return;
-            }
+    Return a single JSON object with these keys. If a value cannot be found, use null or an empty string for strings,
+    and 0 for numbers, but try your best to extract.
+    `;
+    const payload = {
+    contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64ImageData } }] }],
+    generationConfig: { "responseMimeType": "application/json" }
+    };
+    const apiKey = ""; // API key will be provided by Canvas runtime
+    const apiUrl =
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-            try {
-                await addDoc(collection(db, `artifacts/${appId}/users/${userId}/fillups`), fillupData);
-                showModal("Fill-up saved successfully!");
-                resetForm();
-                showMainAppScreen('home-screen');
-                updateNav('nav-home');
-            } catch (error) {
-                console.error("Error saving fill-up: ", error);
-                showModal("Could not save the fill-up. Please try again.");
-            }
-        }
+    try {
+    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body:
+    JSON.stringify(payload) });
+    if (!response.ok) throw new Error(`API call failed: ${response.status}`);
+    const result = await response.json();
 
-        function resetForm() {
-            if (petrolStationNameInput) petrolStationNameInput.value = '';
-            if (petrolStationLocationInput) petrolStationLocationInput.value = '';
-            if (fuelTypeInput) fuelTypeInput.value = '';
-            if (litresFilledInput) litresFilledInput.value = '';
-            if (pricePerLitreInput) pricePerLitreInput.value = '';
-            if (totalCostInput) totalCostInput.value = '';
-            if (odometerReadingInput) odometerReadingInput.value = '';
-            if (dateInput) dateInput.value = '';
-            if (timeInput) timeInput.value = '';
+    if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+    const data = JSON.parse(result.candidates[0].content.parts[0].text);
+    currentExtractedDetails = data; // Store extracted data
+    populateConfirmationScreen(data);
+    showMainAppScreen('confirmation-screen');
+    } else {
+    throw new Error("Invalid response structure from Gemini API.");
+    }
+    } catch (error) {
+    console.error("Error calling Gemini API:", error);
+    showModal("Failed to read the receipt. Please try another image or enter details manually.");
+    resetForm(); // Reset home screen form
+    showMainAppScreen('home-screen'); // Go back to home screen for manual input
+    }
+    }
 
-            confirmPetrolStationNameInput.value = '';
-            confirmPetrolStationLocationInput.value = '';
-            confirmFuelTypeInput.value = '';
-            confirmLitresFilledInput.value = '';
-            confirmPricePerLitreInput.value = '';
-            confirmTotalCostInput.value = '';
-            confirmOdometerReadingInput.value = '';
-            confirmDateInput.value = '';
-            confirmTimeInput.value = '';
+    function populateConfirmationScreen(data) {
+    confirmPetrolStationNameInput.value = data.petrolStationName || '';
+    confirmPetrolStationLocationInput.value = data.petrolStationLocation || '';
+    confirmFuelTypeInput.value = data.fuelType || '';
+    confirmLitresFilledInput.value = data.litresFilled || '';
+    confirmPricePerLitreInput.value = data.pricePerLitre || '';
+    confirmTotalCostInput.value = data.totalCost || '';
+    confirmOdometerReadingInput.value = data.odometerReading || '';
+    confirmDateInput.value = data.date || new Date().toISOString().split('T')[0];
+    confirmTimeInput.value = data.time || '';
+    }
 
-            fileNameDisplay.textContent = '';
-            currentExtractedDetails = null;
-        }
+    async function saveFillup() {
+    if (!isAuthReady) { showModal("Authentication not ready. Please wait."); return; }
 
-        function displayFillupDetails(fillup) {
-            const locationText = fillup.petrolStationLocation ? ` (${fillup.petrolStationLocation})` : '';
-            detailModalTitle.textContent = `Details for ${fillup.petrolStationName}${locationText}`;
-            detailModalContent.innerHTML = `
-                <p><strong>Date:</strong> ${new Date(fillup.date).toLocaleDateString()}</p>
-                <p><strong>Time:</strong> ${fillup.time || 'N/A'}</p>
-                <p><strong>Fuel Type:</strong> ${fillup.fuelType || 'N/A'}</p>
-                <p><strong>Litres Filled:</strong> ${fillup.litresFilled.toFixed(2)} L</p>
-                <p><strong>Price Per Litre:</strong> £${fillup.pricePerLitre.toFixed(3)}</p>
-                <p><strong>Total Cost:</strong> £${fillup.totalCost.toFixed(2)}</p>
-                <p><strong>Odometer Reading:</strong> ${fillup.odometerReading.toLocaleString()}</p>
-            `;
-            showModal(null, 'detail');
-        }
+    const fillupData = {
+    petrolStationName: confirmPetrolStationNameInput.value.trim() || 'Unknown Station',
+    petrolStationLocation: confirmPetrolStationLocationInput.value.trim(),
+    fuelType: confirmFuelTypeInput.value.trim() || 'Other',
+    litresFilled: parseFloat(confirmLitresFilledInput.value) || 0,
+    pricePerLitre: parseFloat(confirmPricePerLitreInput.value) || 0,
+    totalCost: parseFloat(confirmTotalCostInput.value) || 0,
+    odometerReading: parseInt(confirmOdometerReadingInput.value) || 0,
+    date: confirmDateInput.value,
+    time: confirmTimeInput.value,
+    createdAt: new Date().toISOString()
+    };
 
-        function promptForDelete(id) {
-            fillupIdToDelete = id;
-            showModal(null, 'deleteConfirm');
-        }
+    // Validate inputs
+    if (!fillupData.petrolStationName || isNaN(fillupData.litresFilled) || isNaN(fillupData.pricePerLitre) ||
+    isNaN(fillupData.totalCost) || !fillupData.date || isNaN(fillupData.odometerReading)) {
+    showModal("Please fill in Petrol Station Name, Litres, Price, Total Cost, Odometer Reading, and Date with valid
+    values.");
+    return;
+    }
 
-        async function deleteFillup() {
-            if (!fillupIdToDelete || !isAuthReady) return;
-            try {
-                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/fillups`, fillupIdToDelete));
-            } catch (error) {
-                console.error("Error deleting document:", error);
-                showModal("There was a problem deleting the fill-up.");
-            } finally {
-                hideModal('deleteConfirm');
-                fillupIdToDelete = null;
-            }
-        }
+    try {
+    await addDoc(collection(db, `artifacts/${appId}/users/${userId}/fillups`), fillupData);
+    showModal("Fill-up saved successfully!");
+    resetForm();
+    showMainAppScreen('home-screen');
+    updateNav('nav-home');
+    } catch (error) {
+    console.error("Error saving fill-up: ", error);
+    showModal("Could not save the fill-up. Please try again.");
+    }
+    }
 
-        function renderHistoryList() {
-            let sortedFillups = [...allFillups];
-            switch (currentSort) {
-                case 'date-asc':
-                    sortedFillups.sort((a, b) => new Date(a.date) - new Date(b.date));
-                    break;
-                case 'total-desc':
-                    sortedFillups.sort((a, b) => b.totalCost - a.totalCost);
-                    break;
-                case 'total-asc':
-                    sortedFillups.sort((a, b) => a.totalCost - b.totalCost);
-                    break;
-                case 'litres-desc':
-                    sortedFillups.sort((a, b) => b.litresFilled - a.litresFilled);
-                    break;
-                case 'litres-asc':
-                    sortedFillups.sort((a, b) => a.litresFilled - b.litresFilled);
-                    break;
-                case 'odometer-desc':
-                    sortedFillups.sort((a, b) => b.odometerReading - a.odometerReading);
-                    break;
-                case 'odometer-asc':
-                    sortedFillups.sort((a, b) => a.odometerReading - b.odometerReading);
-                    break;
-                case 'date-desc':
-                default:
-                    sortedFillups.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    break;
-            }
+    function resetForm() {
+    if (petrolStationNameInput) petrolStationNameInput.value = '';
+    if (petrolStationLocationInput) petrolStationLocationInput.value = '';
+    if (fuelTypeInput) fuelTypeInput.value = '';
+    if (litresFilledInput) litresFilledInput.value = '';
+    if (pricePerLitreInput) pricePerLitreInput.value = '';
+    if (totalCostInput) totalCostInput.value = '';
+    if (odometerReadingInput) odometerReadingInput.value = '';
+    if (dateInput) dateInput.value = '';
+    if (timeInput) timeInput.value = '';
 
-            if (sortedFillups.length === 0) {
-                historyList.innerHTML = '<p class="text-center text-gray-500">No fill-ups logged yet.</p>';
-                return;
-            }
+    confirmPetrolStationNameInput.value = '';
+    confirmPetrolStationLocationInput.value = '';
+    confirmFuelTypeInput.value = '';
+    confirmLitresFilledInput.value = '';
+    confirmPricePerLitreInput.value = '';
+    confirmTotalCostInput.value = '';
+    confirmOdometerReadingInput.value = '';
+    confirmDateInput.value = '';
+    confirmTimeInput.value = '';
 
-            historyList.innerHTML = '';
-            sortedFillups.forEach(fillup => {
-                const fillupEl = document.createElement('div');
-                fillupEl.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center';
-                const locationText = fillup.petrolStationLocation ? ` (${fillup.petrolStationLocation})` : '';
-                const mainContent = document.createElement('div');
-                mainContent.className = 'flex-grow cursor-pointer';
-                mainContent.innerHTML = `
-                    <p class="font-semibold text-gray-800">${fillup.petrolStationName}${locationText}</p>
-                    <p class="text-sm text-gray-500">${new Date(fillup.date).toLocaleDateString()} at ${fillup.time || ''} - ${fillup.fuelType || 'N/A'}</p>
-                    <p class="text-xs text-gray-400">Odometer: ${fillup.odometerReading.toLocaleString()}</p>
-                `;
-                mainContent.addEventListener('click', () => displayFillupDetails(fillup));
+    fileNameDisplay.textContent = '';
+    currentExtractedDetails = null;
+    }
 
-                const totalEl = document.createElement('p');
-                totalEl.className = 'text-lg font-bold text-blue-600 ml-4';
-                totalEl.textContent = `£${(fillup.totalCost).toFixed(2)}`;
+    function displayFillupDetails(fillup) {
+    const locationText = fillup.petrolStationLocation ? ` (${fillup.petrolStationLocation})` : '';
+    detailModalTitle.textContent = `Details for ${fillup.petrolStationName}${locationText}`;
+    detailModalContent.innerHTML = `
+    <p><strong>Date:</strong> ${new Date(fillup.date).toLocaleDateString()}</p>
+    <p><strong>Time:</strong> ${fillup.time || 'N/A'}</p>
+    <p><strong>Fuel Type:</strong> ${fillup.fuelType || 'N/A'}</p>
+    <p><strong>Litres Filled:</strong> ${fillup.litresFilled.toFixed(2)} L</p>
+    <p><strong>Price Per Litre:</strong> £${fillup.pricePerLitre.toFixed(3)}</p>
+    <p><strong>Total Cost:</strong> £${fillup.totalCost.toFixed(2)}</p>
+    <p><strong>Odometer Reading:</strong> ${fillup.odometerReading.toLocaleString()}</p>
+    `;
+    showModal(null, 'detail');
+    }
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'ml-4 p-2 rounded-full hover:bg-red-100 text-gray-400 hover:text-red-600 transition-colors';
-                deleteBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-                deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); promptForDelete(fillup.id); });
+    function promptForDelete(id) {
+    fillupIdToDelete = id;
+    showModal(null, 'deleteConfirm');
+    }
 
-                fillupEl.appendChild(mainContent);
-                fillupEl.appendChild(totalEl);
-                fillupEl.appendChild(deleteBtn);
-                historyList.appendChild(fillupEl);
-            });
-        }
+    async function deleteFillup() {
+    if (!fillupIdToDelete || !isAuthReady) return;
+    try {
+    await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/fillups`, fillupIdToDelete));
+    } catch (error) {
+    console.error("Error deleting document:", error);
+    showModal("There was a problem deleting the fill-up.");
+    } finally {
+    hideModal('deleteConfirm');
+    fillupIdToDelete = null;
+    }
+    }
 
-        function fetchAndDisplayHistory() {
-            if (unsubscribeHistory) unsubscribeHistory();
-            if (!isAuthReady) return;
-            const fillupsCol = collection(db, `artifacts/${appId}/users/${userId}/fillups`);
-            const q = query(fillupsCol);
+    function renderHistoryList() {
+    let sortedFillups = [...allFillups];
+    switch (currentSort) {
+    case 'date-asc':
+    sortedFillups.sort((a, b) => new Date(a.date) - new Date(b.date));
+    break;
+    case 'total-desc':
+    sortedFillups.sort((a, b) => b.totalCost - a.totalCost);
+    break;
+    case 'total-asc':
+    sortedFillups.sort((a, b) => a.totalCost - b.totalCost);
+    break;
+    case 'litres-desc':
+    sortedFillups.sort((a, b) => b.litresFilled - a.litresFilled);
+    break;
+    case 'litres-asc':
+    sortedFillups.sort((a, b) => a.litresFilled - b.litresFilled);
+    break;
+    case 'odometer-desc':
+    sortedFillups.sort((a, b) => b.odometerReading - a.odometerReading);
+    break;
+    case 'odometer-asc':
+    sortedFillups.sort((a, b) => a.odometerReading - b.odometerReading);
+    break;
+    case 'date-desc':
+    default:
+    sortedFillups.sort((a, b) => new Date(b.date) - new Date(a.date));
+    break;
+    }
 
-            unsubscribeHistory = onSnapshot(q, (querySnapshot) => {
-                allFillups = [];
-                querySnapshot.forEach((doc) => {
-                    allFillups.push({ id: doc.id, ...doc.data() });
-                });
-                renderHistoryList();
-            }, (error) => {
-                console.error("Error listening to history:", error);
-                historyList.innerHTML = '<p class="text-center text-red-500">Could not load history.</p>';
-            });
-        }
+    if (sortedFillups.length === 0) {
+    historyList.innerHTML = '<p class="text-center text-gray-500">No fill-ups logged yet.</p>';
+    return;
+    }
 
-        // --- Summary/Chart Logic ---
-        function updateFilterButtons(activeFilter, buttonGroup) {
-            const btns = document.querySelectorAll(buttonGroup);
-            btns.forEach(btn => {
-                btn.classList.toggle('bg-blue-600', btn.id === activeFilter);
-                btn.classList.toggle('text-white', btn.id === activeFilter);
-                btn.classList.toggle('bg-gray-100', btn.id !== activeFilter);
-                btn.classList.toggle('text-gray-700', btn.id !== activeFilter);
-            });
-        }
+    historyList.innerHTML = '';
+    sortedFillups.forEach(fillup => {
+    const fillupEl = document.createElement('div');
+    fillupEl.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center';
+    const locationText = fillup.petrolStationLocation ? ` (${fillup.petrolStationLocation})` : '';
+    const mainContent = document.createElement('div');
+    mainContent.className = 'flex-grow cursor-pointer';
+    mainContent.innerHTML = `
+    <p class="font-semibold text-gray-800">${fillup.petrolStationName}${locationText}</p>
+    <p class="text-sm text-gray-500">${new Date(fillup.date).toLocaleDateString()} at ${fillup.time || ''} -
+        ${fillup.fuelType || 'N/A'}</p>
+    <p class="text-xs text-gray-400">Odometer: ${fillup.odometerReading.toLocaleString()}</p>
+    `;
+    mainContent.addEventListener('click', () => displayFillupDetails(fillup));
 
-        async function loadSummaryData() {
-            if (!isAuthReady) return;
-            const fillupsCol = collection(db, `artifacts/${appId}/users/${userId}/fillups`);
-            const q = query(fillupsCol);
-            const querySnapshot = await getDocs(q);
-            allFillups = [];
-            querySnapshot.forEach((doc) => {
-                allFillups.push({ id: doc.id, ...doc.data() });
-            });
-            updateChart(3);
-            updateFilterButtons('filter-3m', '.filter-btn');
-            updateFilterButtons('chart-by-station', '.chart-toggle-btn');
-        }
+    const totalEl = document.createElement('p');
+    totalEl.className = 'text-lg font-bold text-blue-600 ml-4';
+    totalEl.textContent = `£${(fillup.totalCost).toFixed(2)}`;
 
-        function updateChart(months) {
-            const cutoffDate = new Date();
-            cutoffDate.setMonth(cutoffDate.getMonth() - months);
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'ml-4 p-2 rounded-full hover:bg-red-100 text-gray-400 hover:text-red-600 transition-colors';
+    deleteBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>`;
+    deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); promptForDelete(fillup.id); });
 
-            const filteredFillups = allFillups.filter(fillup => new Date(fillup.date) >= cutoffDate);
+    fillupEl.appendChild(mainContent);
+    fillupEl.appendChild(totalEl);
+    fillupEl.appendChild(deleteBtn);
+    historyList.appendChild(fillupEl);
+    });
+    }
 
-            if (filteredFillups.length === 0) {
-                noChartData.classList.remove('hidden');
-                chartContainer.classList.add('hidden');
-                summaryDetails.classList.add('hidden');
-                if (fillupChart) fillupChart.destroy();
-                return;
-            }
+    function fetchAndDisplayHistory() {
+    if (unsubscribeHistory) unsubscribeHistory();
+    if (!isAuthReady) return;
+    const fillupsCol = collection(db, `artifacts/${appId}/users/${userId}/fillups`);
+    const q = query(fillupsCol);
 
-            noChartData.classList.add('hidden');
-            chartContainer.classList.remove('hidden');
-            summaryDetails.classList.remove('hidden');
+    unsubscribeHistory = onSnapshot(q, (querySnapshot) => {
+    allFillups = [];
+    querySnapshot.forEach((doc) => {
+    allFillups.push({ id: doc.id, ...doc.data() });
+    });
+    renderHistoryList();
+    }, (error) => {
+    console.error("Error listening to history:", error);
+    historyList.innerHTML = '<p class="text-center text-red-500">Could not load history.</p>';
+    });
+    }
 
-            const totalSpent = filteredFillups.reduce((sum, fillup) => sum + fillup.totalCost, 0);
-            const totalLitres = filteredFillups.reduce((sum, fillup) => sum + fillup.litresFilled, 0);
-            summaryTotalEl.textContent = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(totalSpent);
-            summaryLitresEl.textContent = `${totalLitres.toFixed(2)} L`;
+    // --- Summary/Chart Logic ---
+    function updateFilterButtons(activeFilter, buttonGroup) {
+    const btns = document.querySelectorAll(buttonGroup);
+    btns.forEach(btn => {
+    btn.classList.toggle('bg-blue-600', btn.id === activeFilter);
+    btn.classList.toggle('text-white', btn.id === activeFilter);
+    btn.classList.toggle('bg-gray-100', btn.id !== activeFilter);
+    btn.classList.toggle('text-gray-700', btn.id !== activeFilter);
+    });
+    }
 
-            let dataByGroup;
+    async function loadSummaryData() {
+    if (!isAuthReady) return;
+    const fillupsCol = collection(db, `artifacts/${appId}/users/${userId}/fillups`);
+    const q = query(fillupsCol);
+    const querySnapshot = await getDocs(q);
+    allFillups = [];
+    querySnapshot.forEach((doc) => {
+    allFillups.push({ id: doc.id, ...doc.data() });
+    });
+    updateChart(3);
+    updateFilterButtons('filter-3m', '.filter-btn');
+    updateFilterButtons('chart-by-station', '.chart-toggle-btn');
+    }
 
-            if (currentChartType === 'fuel-type') {
-                dataByGroup = filteredFillups.reduce((acc, fillup) => {
-                    const fuelType = fillup.fuelType || 'Other';
-                    acc[fuelType] = (acc[fuelType] || 0) + fillup.totalCost;
-                    return acc;
-                }, {});
-            } else {
-                dataByGroup = filteredFillups.reduce((acc, fillup) => {
-                    const station = fillup.petrolStationName || 'Unknown Station';
-                    acc[station] = (acc[station] || 0) + fillup.totalCost;
-                    return acc;
-                }, {});
-            }
+    function updateChart(months) {
+    const cutoffDate = new Date();
+    cutoffDate.setMonth(cutoffDate.getMonth() - months);
 
-            summaryListEl.innerHTML = '';
-            const sortedGroups = Object.entries(dataByGroup).sort(([, a], [, b]) => b - a);
+    const filteredFillups = allFillups.filter(fillup => new Date(fillup.date) >= cutoffDate);
 
-            for (const [groupName, amount] of sortedGroups) {
-                const listItem = document.createElement('div');
-                listItem.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-md';
-                listItem.innerHTML = `
-                    <span class="font-medium text-gray-800">${groupName}</span>
-                    <span class="font-semibold text-gray-900">${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount)}</span>
-                `;
-                summaryListEl.appendChild(listItem);
-            }
+    if (filteredFillups.length === 0) {
+    noChartData.classList.remove('hidden');
+    chartContainer.classList.add('hidden');
+    summaryDetails.classList.add('hidden');
+    if (fillupChart) fillupChart.destroy();
+    return;
+    }
 
-            const labels = Object.keys(dataByGroup);
-            const data = Object.values(dataByGroup);
+    noChartData.classList.add('hidden');
+    chartContainer.classList.remove('hidden');
+    summaryDetails.classList.remove('hidden');
 
-            if (fillupChart) fillupChart.destroy();
+    const totalSpent = filteredFillups.reduce((sum, fillup) => sum + fillup.totalCost, 0);
+    const totalLitres = filteredFillups.reduce((sum, fillup) => sum + fillup.litresFilled, 0);
+    summaryTotalEl.textContent = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP'
+    }).format(totalSpent);
+    summaryLitresEl.textContent = `${totalLitres.toFixed(2)} L`;
 
-            const ctx = chartCanvas.getContext('2d');
-            fillupChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: `Total Cost by ${currentChartType === 'fuel-type' ? 'Fuel Type' : 'Station'}`,
-                        data: data,
-                        backgroundColor: labels.map((_, i) => `hsl(${(i * 50) % 360}, 70%, 60%)`),
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => `${c.label}: ${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(c.parsed)}` } } }
-                }
-            });
-        }
+    let dataByGroup;
 
-        // --- Event Listeners Setup ---
-        function setupEventListeners() {
-            loginBtn.addEventListener('click', handleLogin);
-            signupBtn.addEventListener('click', handleSignUp);
-            logoutBtn.addEventListener('click', handleLogout);
+    if (currentChartType === 'fuel-type') {
+    dataByGroup = filteredFillups.reduce((acc, fillup) => {
+    const fuelType = fillup.fuelType || 'Other';
+    acc[fuelType] = (acc[fuelType] || 0) + fillup.totalCost;
+    return acc;
+    }, {});
+    } else {
+    dataByGroup = filteredFillups.reduce((acc, fillup) => {
+    const station = fillup.petrolStationName || 'Unknown Station';
+    acc[station] = (acc[station] || 0) + fillup.totalCost;
+    return acc;
+    }, {});
+    }
 
-            homeNavBtn.addEventListener('click', () => { showMainAppScreen('home-screen'); updateNav('nav-home'); });
-            historyNavBtn.addEventListener('click', () => { showMainAppScreen('history-screen'); updateNav('nav-history'); });
-            summaryNavBtn.addEventListener('click', () => { showMainAppScreen('summary-screen'); updateNav('nav-summary'); });
+    summaryListEl.innerHTML = '';
+    const sortedGroups = Object.entries(dataByGroup).sort(([, a], [, b]) => b - a);
 
-            receiptUploadInput.addEventListener('change', handleFileUpload);
+    for (const [groupName, amount] of sortedGroups) {
+    const listItem = document.createElement('div');
+    listItem.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-md';
+    listItem.innerHTML = `
+    <span class="font-medium text-gray-800">${groupName}</span>
+    <span class="font-semibold text-gray-900">${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP'
+        }).format(amount)}</span>
+    `;
+    summaryListEl.appendChild(listItem);
+    }
 
-            // Event listeners for confirmation screen buttons
-            cancelConfirmBtn.addEventListener('click', () => {
-                resetForm();
-                showMainAppScreen('home-screen');
-            });
-            saveConfirmedBtn.addEventListener('click', () => saveFillup());
+    const labels = Object.keys(dataByGroup);
+    const data = Object.values(dataByGroup);
 
-            alertModalCloseBtn.addEventListener('click', () => hideModal('alert'));
-            detailModalCloseBtn.addEventListener('click', () => hideModal('detail'));
-            deleteConfirmBtn.addEventListener('click', deleteFillup);
-            deleteCancelBtn.addEventListener('click', () => hideModal('deleteConfirm'));
+    if (fillupChart) fillupChart.destroy();
+
+    const ctx = chartCanvas.getContext('2d');
+    fillupChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+    labels: labels,
+    datasets: [{
+    label: `Total Cost by ${currentChartType === 'fuel-type' ? 'Fuel Type' : 'Station'}`,
+    data: data,
+    backgroundColor: labels.map((_, i) => `hsl(${(i * 50) % 360}, 70%, 60%)`),
+    hoverOffset: 4
+    }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (c) => `${c.label}: ${new
+    Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(c.parsed)}` } } }
+    }
+    });
+    }
+
+    // --- Event Listeners Setup ---
+    function setupEventListeners() {
+    loginBtn.addEventListener('click', handleLogin);
+    signupBtn.addEventListener('click', handleSignUp);
+    logoutBtn.addEventListener('click', handleLogout);
+
+    homeNavBtn.addEventListener('click', () => { showMainAppScreen('home-screen'); updateNav('nav-home'); });
+    historyNavBtn.addEventListener('click', () => { showMainAppScreen('history-screen'); updateNav('nav-history'); });
+    summaryNavBtn.addEventListener('click', () => { showMainAppScreen('summary-screen'); updateNav('nav-summary'); });
+
+    receiptUploadInput.addEventListener('change', handleFileUpload);
+
+    // Event listeners for confirmation screen buttons
+    cancelConfirmBtn.addEventListener('click', () => {
+    resetForm();
+    showMainAppScreen('home-screen');
+    });
+    saveConfirmedBtn.addEventListener('click', () => saveFillup());
+
+    alertModalCloseBtn.addEventListener('click', () => hideModal('alert'));
+    detailModalCloseBtn.addEventListener('click', () => hideModal('detail'));
+    deleteConfirmBtn.addEventListener('click', deleteFillup);
+    deleteCancelBtn.addEventListener('click', () => hideModal('deleteConfirm'));
 
 
-            sortBySelect.addEventListener('change', (e) => {
-                currentSort = e.target.value;
-                renderHistoryList();
-            });
+    sortBySelect.addEventListener('change', (e) => {
+    currentSort = e.target.value;
+    renderHistoryList();
+    });
 
-            exportBtn.addEventListener('click', () => {
-                let csvContent = "data:text/csv;charset=utf-8,Date,Time,Petrol Station,Location,Fuel Type,Litres Filled,Price Per Litre,Total Cost,Odometer Reading\n";
-                allFillups.forEach(fillup => {
-                    const row = [
-                        fillup.date,
-                        fillup.time,
-                        `"${fillup.petrolStationName}"`,
-                        `"${fillup.petrolStationLocation}"`,
-                        `"${fillup.fuelType}"`,
-                        fillup.litresFilled,
-                        fillup.pricePerLitre,
-                        fillup.totalCost,
-                        fillup.odometerReading
-                    ];
-                    csvContent += row.join(",") + "\r\n";
-                });
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "fillups.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
+    exportBtn.addEventListener('click', () => {
+    let csvContent = "data:text/csv;charset=utf-8,Date,Time,Petrol Station,Location,Fuel Type,Litres Filled,Price Per
+    Litre,Total Cost,Odometer Reading\n";
+    allFillups.forEach(fillup => {
+    const row = [
+    fillup.date,
+    fillup.time,
+    `"${fillup.petrolStationName}"`,
+    `"${fillup.petrolStationLocation}"`,
+    `"${fillup.fuelType}"`,
+    fillup.litresFilled,
+    fillup.pricePerLitre,
+    fillup.totalCost,
+    fillup.odometerReading
+    ];
+    csvContent += row.join(",") + "\r\n";
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "fillups.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    });
 
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const months = parseInt(btn.id.split('-')[1]);
-                    updateChart(months);
-                    updateFilterButtons(btn.id, '.filter-btn');
-                });
-            });
+    filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+    const months = parseInt(btn.id.split('-')[1]);
+    updateChart(months);
+    updateFilterButtons(btn.id, '.filter-btn');
+    });
+    });
 
-            chartToggleBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    currentChartType = btn.id.includes('station') ? 'station' : 'fuel-type';
-                    const activeFilter = document.querySelector('.filter-btn.bg-blue-600') || document.getElementById('filter-3m');
-                    updateChart(parseInt(activeFilter.id.split('-')[1]));
-                    updateFilterButtons(btn.id, '.chart-toggle-btn');
-                });
-            });
+    chartToggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+    currentChartType = btn.id.includes('station') ? 'station' : 'fuel-type';
+    const activeFilter = document.querySelector('.filter-btn.bg-blue-600') || document.getElementById('filter-3m');
+    updateChart(parseInt(activeFilter.id.split('-')[1]));
+    updateFilterButtons(btn.id, '.chart-toggle-btn');
+    });
+    });
 
-            // Auto-calculate total cost on confirmation screen (only place where manual input occurs for new entries)
-            confirmLitresFilledInput.addEventListener('input', calculateTotalCostConfirmation);
-            confirmPricePerLitreInput.addEventListener('input', calculateTotalCostConfirmation);
-        }
+    // Auto-calculate total cost on confirmation screen (only place where manual input occurs for new entries)
+    confirmLitresFilledInput.addEventListener('input', calculateTotalCostConfirmation);
+    confirmPricePerLitreInput.addEventListener('input', calculateTotalCostConfirmation);
+    }
 
-        function calculateTotalCostConfirmation() {
-            const litres = parseFloat(confirmLitresFilledInput.value);
-            const price = parseFloat(confirmPricePerLitreInput.value);
-            if (!isNaN(litres) && !isNaN(price)) {
-                confirmTotalCostInput.value = (litres * price).toFixed(2);
-            } else {
-                confirmTotalCostInput.value = '';
-            }
-        }
+    function calculateTotalCostConfirmation() {
+    const litres = parseFloat(confirmLitresFilledInput.value);
+    const price = parseFloat(confirmPricePerLitreInput.value);
+    if (!isNaN(litres) && !isNaN(price)) {
+    confirmTotalCostInput.value = (litres * price).toFixed(2);
+    } else {
+    confirmTotalCostInput.value = '';
+    }
+    }
 
-        // --- Initialization ---
-        async function initialize() {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            setupEventListeners();
+    // --- Initialization ---
+    async function initialize() {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    setupEventListeners();
 
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    isAuthReady = true;
-                    authScreen.classList.add('hidden');
-                    authScreen.classList.remove('active-screen');
-                    mainApp.classList.remove('hidden');
-                    showMainAppScreen('home-screen');
-                    updateNav('nav-home');
-                } else {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined') {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Firebase anonymous sign-in failed:", error);
-                        userId = null;
-                        isAuthReady = false;
-                        if (unsubscribeHistory) unsubscribeHistory();
-                        historyList.innerHTML = '';
-                        authScreen.classList.remove('hidden');
-                        authScreen.classList.add('active-screen');
-                        mainApp.classList.add('hidden');
-                    }
-                }
-            });
-        }
+    onAuthStateChanged(auth, async (user) => {
+    if (user) {
+    userId = user.uid;
+    isAuthReady = true;
+    authScreen.classList.add('hidden');
+    authScreen.classList.remove('active-screen');
+    mainApp.classList.remove('hidden');
+    showMainAppScreen('home-screen');
+    updateNav('nav-home');
+    } else {
+    try {
+    if (typeof __initial_auth_token !== 'undefined') {
+    await signInWithCustomToken(auth, __initial_auth_token);
+    } else {
+    await signInAnonymously(auth);
+    }
+    } catch (error) {
+    console.error("Firebase anonymous sign-in failed:", error);
+    userId = null;
+    isAuthReady = false;
+    if (unsubscribeHistory) unsubscribeHistory();
+    historyList.innerHTML = '';
+    authScreen.classList.remove('hidden');
+    authScreen.classList.add('active-screen');
+    mainApp.classList.add('hidden');
+    }
+    }
+    });
+    }
 
-        initialize();
+    initialize();
 
     </script>
 </body>
