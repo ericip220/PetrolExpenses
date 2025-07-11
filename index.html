@@ -432,18 +432,29 @@
         const filterBtns = document.querySelectorAll('.filter-btn');
         const chartToggleBtns = document.querySelectorAll('.chart-toggle-btn');
 
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-            apiKey: "AIzaSyD9U3RzDKV_ZUK8_groLt0x9KxzmoLnjGw",
-            authDomain: "petrolfilluptracker.firebaseapp.com",
-            projectId: "petrolfilluptracker",
-            storageBucket: "petrolfilluptracker.firebasestorage.app",
-            messagingSenderId: "1040000770286",
-            appId: "1:1040000770286:web:063ee98f41b69cf990d3ff",
-            measurementId: "G-1PHPSQC11Z"
-        };
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBbGDJkfAvxxgZKb_m24cevQuuGdpgM240",
+    authDomain: "petrol-fill-up-tracker.firebaseapp.com",
+    projectId: "petrol-fill-up-tracker",
+    storageBucket: "petrol-fill-up-tracker.firebasestorage.app",
+    messagingSenderId: "293478669422",
+    appId: "1:293478669422:web:e9b4b99621f043f5e51a7f",
+    measurementId: "G-JM0EKCBRSS"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 
         // --- Utility Functions ---
         function showMainAppScreen(screenId) {
