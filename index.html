@@ -632,6 +632,13 @@
         async function saveFillup() {
             if (!isAuthReady) { showModal("Authentication not ready. Please wait."); return; }
 
+            // Ensure db and userId are available before proceeding
+            if (!db || !userId) {
+                console.error("Firestore or User ID not initialized. Cannot save fill-up.");
+                showModal("App not ready. Please try again.");
+                return;
+            }
+
             const fillupData = {
                 petrolStationName: confirmPetrolStationNameInput.value.trim() || 'Unknown Station',
                 petrolStationLocation: confirmPetrolStationLocationInput.value.trim(),
@@ -664,6 +671,8 @@
         }
 
         function resetForm() {
+            // These variables are kept for the `resetForm` function to avoid errors, even if the elements are not in the DOM.
+            // They are checked for existence before attempting to set their value.
             if (petrolStationNameInput) petrolStationNameInput.value = '';
             if (petrolStationLocationInput) petrolStationLocationInput.value = '';
             if (fuelTypeInput) fuelTypeInput.value = '';
@@ -710,6 +719,14 @@
 
         async function deleteFillup() {
             if (!fillupIdToDelete || !isAuthReady) return;
+
+            // Ensure db and userId are available before proceeding
+            if (!db || !userId) {
+                console.error("Firestore or User ID not initialized. Cannot delete fill-up.");
+                showModal("App not ready. Please try again.");
+                return;
+            }
+
             try {
                 await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/fillups`, fillupIdToDelete));
             } catch (error) {
@@ -789,6 +806,14 @@
         function fetchAndDisplayHistory() {
             if (unsubscribeHistory) unsubscribeHistory();
             if (!isAuthReady) return;
+
+            // Ensure db and userId are available before proceeding
+            if (!db || !userId) {
+                console.error("Firestore or User ID not initialized. Cannot fetch history.");
+                historyList.innerHTML = '<p class="text-center text-red-500">App not ready to load history. Please try again.</p>';
+                return;
+            }
+
             const fillupsCol = collection(db, `artifacts/${appId}/users/${userId}/fillups`);
             const q = query(fillupsCol);
 
@@ -817,6 +842,16 @@
 
         async function loadSummaryData() {
             if (!isAuthReady) return;
+
+            // Ensure db and userId are available before proceeding
+            if (!db || !userId) {
+                console.error("Firestore or User ID not initialized. Cannot load summary data.");
+                noChartData.classList.remove('hidden'); // Show no data message
+                chartContainer.classList.add('hidden');
+                summaryDetails.classList.add('hidden');
+                return;
+            }
+
             const fillupsCol = collection(db, `artifacts/${appId}/users/${userId}/fillups`);
             const q = query(fillupsCol);
             const querySnapshot = await getDocs(q);
@@ -1009,14 +1044,16 @@
                     mainApp.classList.remove('hidden');
                     showMainAppScreen('home-screen');
                     updateNav('nav-home');
+                    console.log("User authenticated:", userId); // Log user ID
                 } else {
                     try {
-                        // For deployed apps outside of Canvas, __initial_auth_token will be undefined.
-                        // We rely on anonymous sign-in for simplicity as per previous requests.
+                        // Attempt anonymous sign-in if no user is logged in
                         await signInAnonymously(auth);
+                        // onAuthStateChanged will trigger again with the anonymous user,
+                        // leading to the 'if (user)' block above.
                     } catch (error) {
                         console.error("Firebase anonymous sign-in failed:", error);
-                        // Fallback to showing auth screen if anonymous sign-in fails
+                        // If anonymous sign-in also fails, then show the auth screen
                         userId = null;
                         isAuthReady = false;
                         if (unsubscribeHistory) unsubscribeHistory();
@@ -1026,6 +1063,7 @@
                         mainApp.classList.add('hidden');
                     }
                 }
+                console.log("Auth state changed. userId:", userId, "isAuthReady:", isAuthReady); // Log auth state
             });
         }
 
